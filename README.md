@@ -6,5 +6,6 @@ Enable developer mode in discord and get the ```ChannelID``` by selecting the la
 
 ```bash
 npm install discord.js
+npm install node-fetch@2
 node .
 ```

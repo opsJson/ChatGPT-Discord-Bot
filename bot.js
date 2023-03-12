@@ -3,6 +3,7 @@ const OpeanAIToken = "opeanai-token";
 const ChannelID = "channel-id";
 const MaxTokens = 2048;
 
+const fetch = require("node-fetch");
 const {Client, GatewayIntentBits} = require("discord.js");
 const client = new Client({intents:[
 	GatewayIntentBits.Guilds,

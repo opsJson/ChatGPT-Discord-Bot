@@ -1,19 +1,41 @@
-const DiscordToken = "discord-token";
-const OpeanAIToken = "opeanai-token";
-const ChannelID = "channel-id";
-const MaxTokens = 2048;
-
-const fetch = require("node-fetch");
 const {Client, GatewayIntentBits} = require("discord.js");
+const fetch = require("node-fetch");
+
 const client = new Client({intents:[
 	GatewayIntentBits.Guilds,
 	GatewayIntentBits.GuildMessages,
 	GatewayIntentBits.MessageContent
 ]});
 
+const DiscordToken = "discord-token";
+const ChatGPTToken = "opeanai-token";
+const MaxTokens = 2048;
+let ChatGPTChannelID;
+
+client.on("ready", () => {
+	client.application.commands.create({
+		name: "channel",
+		description: "Set bot channel",
+		options: [{
+			name: "id",
+			description: "Channel ID",
+			type: 3,
+			required: true
+		}]
+	});
+});
+
+client.on("interactionCreate", (interaction) => {
+	ChatGPTChannelID = interaction.options.getString("id").trim();
+	interaction.reply({
+		content: "Channel updated!",
+		ephemeral: true
+	});
+});
+
 client.on("messageCreate", async (message) => {
-	if (message.channel.id != ChannelID) return;
 	if (message.author.bot) return;
+	if (message.channel.id != ChatGPTChannelID) return;
 	
 	interval = setInterval(() => {
 		message.channel.sendTyping();
@@ -41,7 +63,7 @@ client.on("messageCreate", async (message) => {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
-			"Authorization": `Bearer ${OpeanAIToken}`
+			"Authorization": `Bearer ${ChatGPTToken}`
 		},
 		body: JSON.stringify({
 			model: "gpt-3.5-turbo",

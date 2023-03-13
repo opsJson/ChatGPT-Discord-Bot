@@ -1,4 +1,8 @@
 # ChatGPT-Discord-Bot
+### How it Works
+Simply turn a channel on your Discord server into a ChatGPT chat room.  
+Anyone can interact with the AI.
+
 ### Quick Start
 Create your bot and get your ```DiscordToken``` at https://discord.com/developers/applications  
 Create your account and get your ```OpeanAIToken``` at https://platform.openai.com/  

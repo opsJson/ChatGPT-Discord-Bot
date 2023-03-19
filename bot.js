@@ -88,7 +88,14 @@ client.on("messageCreate", async (message) => {
 			message.channel.send(chunk);
 		});
 	})
-	.catch(e => console.error(e));
+	.catch(e => {
+		e = e.match(/[\s\S]{1,2000}/g);
+		
+		clearInterval(interval);
+		e.forEach(chunk => {
+			message.channel.send(chunk);
+		});
+	});
 });
 
 client.login(DiscordToken);

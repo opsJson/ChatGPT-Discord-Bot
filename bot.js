@@ -8,7 +8,7 @@ const client = new Client({intents:[
 ]});
 
 const DiscordToken = "discord-token";
-const ChatGPTToken = "opeanai-token";
+const OpenAIToken = "openai-token";
 const MaxTokens = 2048;
 let ChatGPTChannelID;
 
@@ -23,24 +23,31 @@ client.on("ready", () => {
 			required: true
 		}]
 	});
+	console.log("ChatGPT Bot online!");
 });
 
-client.on("interactionCreate", (interaction) => {
-	ChatGPTChannelID = interaction.options.getString("id").trim();
-	interaction.reply({
-		content: "Channel updated!",
-		ephemeral: true
-	});
+client.on("interactionCreate", async (interaction) => {
+	const channelID = interaction.options.getString("id").trim();
+	const channel = await client.channels.cache.get(channelID);
+	
+	if (channel) {
+		ChatGPTChannelID = channelID;
+		interaction.reply({
+			content: `Now listening in <#${channelID}>`,
+			ephemeral: true
+		});
+	}
+	else {
+		interaction.reply({
+			content: `Could not find channel **${channelID}**`,
+			ephemeral: true
+		});
+	}
 });
 
 client.on("messageCreate", async (message) => {
 	if (message.author.bot) return;
 	if (message.channel.id != ChatGPTChannelID) return;
-	
-	interval = setInterval(() => {
-		message.channel.sendTyping();
-	}, 10000);
-	message.channel.sendTyping();
 	
 	const messages = await message.channel.messages.fetch();
 	const chat = [];
@@ -59,11 +66,13 @@ client.on("messageCreate", async (message) => {
 	
 	chat.reverse();
 	
+	message.channel.sendTyping();
+	
 	fetch("https://api.openai.com/v1/chat/completions", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
-			"Authorization": `Bearer ${ChatGPTToken}`
+			"Authorization": `Bearer ${OpenAIToken}`
 		},
 		body: JSON.stringify({
 			model: "gpt-3.5-turbo",
@@ -72,7 +81,6 @@ client.on("messageCreate", async (message) => {
 	})
 	.then(r => {
 		if (r.status != 200) {
-			clearInterval(interval);
 			message.channel.send(r);
 			return null;
 		}
@@ -83,7 +91,6 @@ client.on("messageCreate", async (message) => {
 		r = r.choices[0].message.content;
 		r = r.match(/[\s\S]{1,2000}/g);
 		
-		clearInterval(interval);
 		r.forEach(chunk => {
 			message.channel.send(chunk);
 		});
@@ -91,7 +98,6 @@ client.on("messageCreate", async (message) => {
 	.catch(e => {
 		e = e.match(/[\s\S]{1,2000}/g);
 		
-		clearInterval(interval);
 		e.forEach(chunk => {
 			message.channel.send(chunk);
 		});

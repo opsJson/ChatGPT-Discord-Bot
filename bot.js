@@ -9,7 +9,7 @@ const client = new Client({intents:[
 
 const DiscordToken = "discord-token";
 const OpenAIToken = "openai-token";
-const MaxTokens = 2048;
+const MaxChars = 8200;
 let ChatGPTChannelID;
 
 client.on("ready", () => {
@@ -56,7 +56,7 @@ client.on("messageCreate", async (message) => {
 	messages.forEach(message => {
 		counter += message.content.length;
 
-		if (counter > MaxTokens) return false;
+		if (counter > MaxChars) return false;
 		
 		chat.push({
 			role: message.author.id == client.user.id ? "assistant" : "user",

@@ -109,6 +109,7 @@ client.on("messageCreate", async (message) => {
 
 		if (counter > MaxChars) return false;
 		if (message.content.length == 0) return false;
+		if (message.content.startsWith("!")) return false;
 		
 		chat.push({
 			role: message.author.id == client.user.id ? "assistant" : "user",

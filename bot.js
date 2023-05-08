@@ -42,11 +42,17 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 client.on("messageCreate", async (message) => {
+	let IsPlaygroundChat = false;
+	
 	if (message.author.bot) return;
 	if (message.content.startsWith("!")) return;
 	
 	if (!(message.mentions.has(client.user) ||
 		 (message.channel.parent && message.channel.parent.id == ChatGPTParentID))) return;
+	
+	if (message.channel.parent && message.channel.parent.id == ChatGPTParentID) {
+		IsPlaygroundChat = true;
+	}
 	
 	const messages = await message.channel.messages.fetch();
 	const chat = [];
@@ -61,7 +67,7 @@ client.on("messageCreate", async (message) => {
 		
 		chat.push({
 			role: message.author.id == client.user.id ? "assistant" : "user",
-			content: message.content
+			content: IsPlaygroundChat ? message.content :  `${message.author.username}: ${message.content}`
 		});
 	});
 	

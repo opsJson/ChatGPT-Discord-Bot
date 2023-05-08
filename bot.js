@@ -43,9 +43,10 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("messageCreate", async (message) => {
 	if (message.author.bot) return;
-	if (!message.channel.parent) return;
 	if (message.content.startsWith("!")) return;
-	if (message.channel.parent != ChatGPTParentID) return;
+	
+	if (!(message.mentions.has(client.user) ||
+		 (message.channel.parent && message.channel.parent.id == ChatGPTParentID))) return;
 	
 	const messages = await message.channel.messages.fetch();
 	const chat = [];
@@ -64,6 +65,7 @@ client.on("messageCreate", async (message) => {
 		});
 	});
 	
+	chat[0].content = chat[0].content.replace(`<@${client.user.id}>`, "");
 	if (chat.length > 1) chat.reverse();
 	
 	const interval = setInterval(() => message.channel.sendTyping(), 5000);
@@ -96,7 +98,8 @@ client.on("messageCreate", async (message) => {
 		});
 	}
 	catch(e) {
-		clearInterval(interval); 
+		console.log(e);
+		clearInterval(interval);
 		message.channel.send("Erro interno!");
 	}
 });

@@ -72,7 +72,13 @@ client.on("messageCreate", async (message) => {
 	});
 	
 	chat[0].content = chat[0].content.replace(`<@${client.user.id}>`, "");
+	
 	if (chat.length > 1) chat.reverse();
+	
+	if (!IsPlaygroundChat) chat.push({
+		role: "assistant",
+		content: "ChatGPT Bot:"
+	});
 	
 	const interval = setInterval(() => message.channel.sendTyping(), 5000);
 	message.channel.sendTyping();
